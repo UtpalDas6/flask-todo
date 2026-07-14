@@ -10,21 +10,10 @@
 
 <body>
     <div class="wrap">
-        {% if not logged_in %}
-        <header>
-            <h1>Todo</h1>
-        </header>
-        <div class="signin">
-            <p class="empty">Track tasks and habits, earn coins for streaks.</p>
-            <a class="button-link" href="/login">Sign in with Google</a>
-        </div>
-        {% else %}
         <header>
             <h1>Todo</h1>
             <div class="header-right">
                 <div class="coins">🪙 {{ user.coins }}</div>
-                <span class="user">{{ user.name or user.email }}</span>
-                <a class="action" href="/logout">Sign out</a>
             </div>
         </header>
 
@@ -72,7 +61,6 @@
             </div>
             {% endfor %}
         </section>
-        {% endif %}
     </div>
 </body>
 
