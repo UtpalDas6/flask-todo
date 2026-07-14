@@ -5,39 +5,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo App</title>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
-    <div style="margin-top: 50px;" class="ui container">
-        <h1 class="ui center aligned header">To Do App</h1>
-
-        <form class="ui form" action="/add" method="post">
-            <div class="field">
-                <label>Todo Title</label>
-                <input type="text" name="title" placeholder="Enter Todo..."><br>
+    <div class="wrap">
+        {% if not logged_in %}
+        <header>
+            <h1>Todo</h1>
+        </header>
+        <div class="signin">
+            <p class="empty">Track tasks and habits, earn coins for streaks.</p>
+            <a class="button-link" href="/login">Sign in with Google</a>
+        </div>
+        {% else %}
+        <header>
+            <h1>Todo</h1>
+            <div class="header-right">
+                <div class="coins">🪙 {{ user.coins }}</div>
+                <span class="user">{{ user.name or user.email }}</span>
+                <a class="action" href="/logout">Sign out</a>
             </div>
-            <button class="ui blue button" type="submit">Add</button>
-        </form>
+        </header>
 
-        <hr>
+        <section>
+            <h2>Habits</h2>
+            <form class="add-row" action="/habit/add" method="post">
+                <input type="text" name="name" placeholder="New habit (e.g. No Instagram, Drink water)">
+                <button type="submit">Add</button>
+            </form>
 
-        {% for todo in todo_list %}
-        <div class="ui segment">
-            <p class="ui big header">{{todo.id }} | {{ todo.title }}</p>
-
-            {% if todo.complete == False %}
-            <span class="ui gray label">Not Complete</span>
-            {% else %}
-            <span class="ui green label">Completed</span>
+            {% if not habits %}
+            <p class="empty">No habits yet. Streaks earn coins every day, with a bonus every 7 days.</p>
             {% endif %}
 
-            <a class="ui blue button" href="/update/{{ todo.id }}">Update</a>
-            <a class="ui red button" href="/delete/{{ todo.id }}">Delete</a>
-        </div>
-        {% endfor %}
+            {% for habit in habits %}
+            <div class="row">
+                <span class="title">{{ habit.name }}</span>
+                <span class="streak {% if habit.streak > 0 %}active{% endif %}">🔥 {{ habit.streak }}</span>
+                {% if habit.last_done == today %}
+                <span class="checkin done">Done today ✓</span>
+                {% else %}
+                <a class="checkin" href="/habit/checkin/{{ habit.id }}">Check in</a>
+                {% endif %}
+                <a class="action" href="/habit/delete/{{ habit.id }}">Delete</a>
+            </div>
+            {% endfor %}
+        </section>
+
+        <section>
+            <h2>Tasks</h2>
+            <form class="add-row" action="/add" method="post">
+                <input type="text" name="title" placeholder="New task...">
+                <button type="submit">Add</button>
+            </form>
+
+            {% if not todo_list %}
+            <p class="empty">No tasks yet.</p>
+            {% endif %}
+
+            {% for todo in todo_list %}
+            <div class="row">
+                <span class="title {% if todo.complete %}done{% endif %}">{{ todo.title }}</span>
+                <a class="action" href="/update/{{ todo.id }}">{{ 'Undo' if todo.complete else 'Complete' }}</a>
+                <a class="action" href="/delete/{{ todo.id }}">Delete</a>
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
     </div>
 </body>
 
