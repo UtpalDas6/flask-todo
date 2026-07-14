@@ -138,3 +138,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+.gstack/
+
+# OAuth client secrets downloaded from Google Cloud Console
+client_secret*.json
